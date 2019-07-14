@@ -2,8 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { Hero }         from '../hero';
-import { HeroService }  from '../hero.service';
+import { Hero } from '../hero';
+import { HeroService } from '../hero.service';
 
 @Component({
   selector: 'app-hero-detail',
@@ -33,8 +33,32 @@ export class HeroDetailComponent implements OnInit {
     this.location.back();
   }
 
- save(): void {
-    this.heroService.updateHero(this.hero)
-      .subscribe(() => this.goBack());
+  save(): void {
+    const p = new Promise((resolve) => {
+      this.heroService.updateHero(this.hero)
+        .subscribe(() => this.goBack());
+      resolve();
+    });
+  }
+
+ // save(): void {
+ //    this.debounce(() => {
+ //      this.heroService.updateHero(this.hero)
+ //        .subscribe(() => this.goBack());
+ //    }, 250, false)();
+ //  }
+  debounce (func, wait, immediate) {
+    let timeout;
+    return function ()  {
+      const context = this, args = arguments;
+      const later = function() {
+        timeout = null;
+        if (!immediate) { func.apply(context, args); }
+      };
+      const callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) { func.apply(context, args); }
+    };
   }
 }
